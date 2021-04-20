@@ -9,7 +9,7 @@ Url Navigator是一个基于Flutter Navigator2.0的路由框架，它的特色�
 
 由于自己只是一个经验尚浅的在校学生(虽然快毕业了吧), 难免有一些实现的地方不够优雅或者存在隐患。如果大家有希望和我合作开发此package的想法, 欢迎通过QQ101425129或者邮箱jkouulong@qq.com和我联系。
 
-下面是简单的使用Url Navigator的步骤, 更多细节请参考example工程
+下面是简单的使用Url Navigator的步骤, 更多细节请参考example工程.
 
 # Url Navigator的使用
 
