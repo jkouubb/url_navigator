@@ -5,19 +5,11 @@ class ListDetailPageNode extends PageTreeNode {
   ListDetailPageNode()
       : super(
           name: 'list_detail_page',
-          builder: (key, name, parameters) =>
-              ListDetailPage(key: key, name: name, parameters: parameters),
-        );
-}
-
-class ListDetailPage extends SimpleUrlPage {
-  ListDetailPage({Key key, String name, Map<String, String> parameters})
-      : super(
-          key: key,
-          name: name,
-          parameters: parameters,
-          builder: (context) => ListDetailPageWidget(
-            name: parameters['name'],
+          routeBuilder: (settings) => UrlPageRoute(
+            settings: settings,
+            content: ListDetailPageWidget(
+              name: settings.arguments['name'],
+            ),
           ),
         );
 }

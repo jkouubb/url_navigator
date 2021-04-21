@@ -5,18 +5,11 @@ class EditSettingPageNode extends PageTreeNode {
   EditSettingPageNode()
       : super(
           name: 'edit_setting_page',
-          builder: (Key key, String name, Map<String, String> parameters) =>
-              EditSettingPage(key: key, name: name, parameters: parameters),
+          routeBuilder: (settings) => UrlPageRoute(
+            settings: settings,
+            content: EditSettingPageWidget(),
+          ),
         );
-}
-
-class EditSettingPage extends SimpleUrlPage {
-  EditSettingPage({Key key, String name, Map<String, String> parameters})
-      : super(
-            key: key,
-            name: name,
-            parameters: parameters,
-            builder: (context) => EditSettingPageWidget());
 }
 
 class EditSettingPageWidget extends StatefulWidget {

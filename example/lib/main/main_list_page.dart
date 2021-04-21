@@ -5,26 +5,11 @@ class MainListPageNode extends PageTreeNode {
   MainListPageNode()
       : super(
           name: 'list',
-          builder: (key, name, parameters) => MainListPage(),
+          routeBuilder: (settings) => NoTransitionUrlPageRoute(
+            settings: settings,
+            content: MainListPageWidget(),
+          ),
         );
-}
-
-class MainListPage extends SimpleUrlPage {
-  MainListPage({Key key, String name, Map<String, String> parameters})
-      : super(
-          key: key,
-          name: name,
-          parameters: parameters,
-          builder: (context) => MainListPageWidget(),
-        );
-
-  @override
-  Route createRoute(BuildContext context) {
-    return NoTransitionUrlPageRoute(
-      settings: this,
-      child: builder(context),
-    );
-  }
 }
 
 class MainListPageWidget extends StatefulWidget {
@@ -66,8 +51,7 @@ class _MainListPageWidgetState extends State<MainListPageWidget> {
         onPressed: () async {
           bool result = await UrlDelegate.of(context).pushPopUp('pop_up');
 
-          UrlDelegate.of(context)
-              .pushPopUp('toast', parameters: {'message': result.toString()});
+          UrlDelegate.of(context).pushPopUp('toast', parameters: {'message': result.toString()});
 
           await Future.delayed(Duration(seconds: 2));
 

@@ -5,49 +5,122 @@ import 'page.dart';
 
 typedef AnonymousPageBuilder = Route Function(Map<String, String> params);
 
-abstract class UrlRoute<T> extends PageRoute<T> {
-  UrlRoute({UrlPage settings}) : super(settings: settings);
-}
+class UrlPageRoute<T> extends PageRoute<T> with CupertinoRouteTransitionMixin {
+  UrlPageRoute({UrlPage settings, this.content}) : super(settings: settings);
 
-class UrlPageRoute<T> extends UrlRoute<T> with CupertinoRouteTransitionMixin {
-  UrlPageRoute({UrlPage settings, this.child}) : super(settings: settings);
-
-  final Widget child;
+  final Widget content;
 
   @override
   Widget buildContent(BuildContext context) {
-    return child;
+    return content;
   }
 
+  bool isAppear = false;
+  bool isFirstAppear = true;
+
   @override
-  bool get maintainState => true;
+  String get title => settings.name;
+
+  @override
+  final bool maintainState = true;
 
   @override
   Duration get transitionDuration => Duration(milliseconds: 300);
 
   @override
-  String get title => settings.name;
+  Duration get reverseTransitionDuration => Duration(milliseconds: 300);
+
+  @override
+  Color get barrierColor => null;
+
+  @override
+  String get barrierLabel => null;
+
+  void init() {}
+
+  /// Called when the page appear
+  void appear() {}
+
+  /// Called when the page disappear
+  void disappear() {}
+
+  @override
+  void didChangeNext(Route<dynamic> nextRoute) {
+    super.didChangeNext(nextRoute);
+    if (nextRoute == null) {
+      if (!isAppear) {
+        isAppear = true;
+        appear();
+        isFirstAppear = false;
+      }
+    } else {
+      if (isAppear) {
+        isAppear = false;
+        disappear();
+      }
+    }
+  }
+
+  @override
+  bool didPop(dynamic result) {
+//    print('-- ${settings.name} didPop $result');
+    if (isAppear) {
+      isAppear = false;
+      disappear();
+    }
+    return super.didPop(result);
+  }
+
+  @override
+  TickerFuture didPush() {
+//    print('-- ${settings.name} didPush');
+    if (!isAppear) {
+      isAppear = true;
+      init();
+      appear();
+      isFirstAppear = false;
+    }
+    return super.didPush();
+  }
+
+  @override
+  void didReplace(Route<dynamic> oldRoute) {
+    super.didReplace(oldRoute);
+    if (oldRoute is UrlPageRoute && !isAppear) {
+      isAppear = true;
+      init();
+      appear();
+      isFirstAppear = false;
+    }
+  }
+
+  @override
+  void didPopNext(Route<dynamic> nextRoute) {
+    super.didPopNext(nextRoute);
+    if (nextRoute is UrlPageRoute && !isAppear) {
+      isAppear = true;
+      appear();
+      isFirstAppear = false;
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 }
 
 class NoTransitionUrlPageRoute<T> extends UrlPageRoute<T> {
-  NoTransitionUrlPageRoute({UrlPage settings, this.child})
-      : super(settings: settings);
-
-  final Widget child;
-
-  @override
-  Widget buildContent(BuildContext context) {
-    return child;
-  }
+  NoTransitionUrlPageRoute({UrlPage settings, Widget content}) : super(settings: settings, content: content);
 
   @override
   Duration get transitionDuration => Duration(milliseconds: 0);
 }
 
-class PopupBoxRoute<T> extends UrlRoute<T> {
-  PopupBoxRoute({UrlPage settings, this.child}) : super(settings: settings);
+class UrlPopupRoute<T> extends PageRoute<T> {
+  UrlPopupRoute({UrlPage settings, this.content}) : super(settings: settings);
 
-  final Widget child;
+  final Widget content;
 
   @override
   bool get maintainState => true;
@@ -62,9 +135,8 @@ class PopupBoxRoute<T> extends UrlRoute<T> {
   String get barrierLabel => null;
 
   @override
-  Widget buildPage(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation) {
-    return child;
+  Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
+    return content;
   }
 
   @override

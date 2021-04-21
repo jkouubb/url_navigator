@@ -46,11 +46,13 @@ class MyAppState extends State<MyApp> {
   void initState() {
     delegate = RootUrlDelegate(treeName: 'app');
     delegate.addAnonymousPageBuilder({
-      'toast': (parameters) => PopupBoxRoute(
-              child: MainToastWidget(
+      'toast': (parameters) => UrlPopupRoute(
+              content: MainToastWidget(
             message: parameters['message'],
           )),
-      'pop_up': (parameters) => PopupBoxRoute(child: MainPopUpWidget()),
+      'pop_up': (parameters) => UrlPopupRoute(
+            content: MainPopUpWidget(),
+          ),
     });
 
     TreeNodeCache.instance.addListener(delegate);

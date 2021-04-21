@@ -5,18 +5,10 @@ class SettingPageNode extends PageTreeNode {
   SettingPageNode()
       : super(
           name: 'setting_page',
-          builder: (key, name, parameters) =>
-              SettingPage(key: key, name: name, parameters: parameters),
-        );
-}
-
-class SettingPage extends SimpleUrlPage {
-  SettingPage({Key key, String name, Map<String, String> parameters})
-      : super(
-          key: key,
-          name: name,
-          parameters: parameters,
-          builder: (context) => SettingPageWidget(),
+          routeBuilder: (settings) => UrlPageRoute(
+            settings: settings,
+            content: SettingPageWidget(),
+          ),
         );
 }
 
@@ -53,8 +45,7 @@ class SettingPageWidgetState extends State<SettingPageWidget> {
               constraints: BoxConstraints.tight(Size(200, 40)),
               child: ElevatedButton(
                 onPressed: () async {
-                  UrlDelegate.of(context)
-                      .push('app/setting_page/edit_setting_page');
+                  UrlDelegate.of(context).push('app/setting_page/edit_setting_page');
 
                   String result = await UrlDelegate.of(context).waitResult();
 

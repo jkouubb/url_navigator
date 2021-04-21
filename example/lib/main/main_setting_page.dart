@@ -5,27 +5,11 @@ class MainSettingPageNode extends PageTreeNode {
   MainSettingPageNode()
       : super(
           name: 'enter_setting',
-          builder: (key, name, parameters) =>
-              MainSettingPage(key: key, name: name, parameters: parameters),
+          routeBuilder: (settings) => NoTransitionUrlPageRoute(
+            settings: settings,
+            content: MainSettingPageWidget(),
+          ),
         );
-}
-
-class MainSettingPage extends SimpleUrlPage {
-  MainSettingPage({Key key, String name, Map<String, String> parameters})
-      : super(
-          key: key,
-          name: name,
-          parameters: parameters,
-          builder: (context) => MainSettingPageWidget(),
-        );
-
-  @override
-  Route createRoute(BuildContext context) {
-    return NoTransitionUrlPageRoute(
-      settings: this,
-      child: builder(context),
-    );
-  }
 }
 
 class MainSettingPageWidget extends StatelessWidget {
@@ -58,9 +42,7 @@ class MainSettingPageWidget extends StatelessWidget {
                   constraints: BoxConstraints.tight(Size(200, 40)),
                   child: ElevatedButton(
                     onPressed: () {
-                      UrlDelegate.of(context).push(
-                          'app/main/list/list_page/list_detail_page',
-                          parameters: {'name': 'jack'});
+                      UrlDelegate.of(context).push('app/main/list/list_page/list_detail_page', parameters: {'name': 'jack'});
                     },
                     child: Text(
                       'detail with jack',
@@ -77,8 +59,7 @@ class MainSettingPageWidget extends StatelessWidget {
         onPressed: () async {
           bool result = await UrlDelegate.of(context).pushPopUp('pop_up');
 
-          UrlDelegate.of(context)
-              .pushPopUp('toast', parameters: {'message': result.toString()});
+          UrlDelegate.of(context).pushPopUp('toast', parameters: {'message': result.toString()});
 
           await Future.delayed(Duration(seconds: 2));
 

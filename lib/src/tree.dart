@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'page.dart';
+import 'route.dart';
 
 abstract class TreeNode {
   TreeNode({@required this.name});
@@ -29,7 +30,7 @@ abstract class TreeNode {
 class PageTreeNode extends TreeNode {
   PageTreeNode({
     @required String name,
-    @required this.builder,
+    @required this.routeBuilder,
     Map<String, String> parameters,
   }) : super(name: name) {
     if (parameters != null) {
@@ -39,7 +40,7 @@ class PageTreeNode extends TreeNode {
 
   final Map<String, String> _parameters = {};
 
-  final PageBuilder builder;
+  final UrlPageRoute Function(UrlPage settomgs) routeBuilder;
 
   Map<String, String> get parameters => Map.unmodifiable(_parameters);
 
@@ -69,18 +70,15 @@ class PageTreeNode extends TreeNode {
   }
 
   PageTreeNode _copy(Map<String, String> parameters) {
-    PageTreeNode copyNode =
-        PageTreeNode(name: name, builder: builder, parameters: parameters);
+    PageTreeNode copyNode = PageTreeNode(name: name, routeBuilder: routeBuilder, parameters: parameters);
 
     copyNode.parent = _parent;
 
     return copyNode;
   }
 
-  Page getPage() => builder(
-      ValueKey(PageObjectForKey(name: name, parameters: _parameters)),
-      name,
-      _parameters);
+  UrlPage getPage() =>
+      UrlPage(key: ValueKey(PageObjectForKey(name: name, parameters: parameters)), name: name, parameters: parameters, routeBuilder: routeBuilder);
 }
 
 class FolderTreeNode extends TreeNode {
@@ -163,13 +161,7 @@ class PageTreeInspector {
     for (int i = 0; i < indexList.length; i++) {
       for (final PageTree tree in _trees) {
         if (tree.rootName == pathNodes[indexList[i]]) {
-          PageTreeNode node = tree.findNode(
-              pathNodes.sublist(
-                  indexList[i],
-                  i == indexList.length - 1
-                      ? pathNodes.length
-                      : indexList[i + 1]),
-              parameters);
+          PageTreeNode node = tree.findNode(pathNodes.sublist(indexList[i], i == indexList.length - 1 ? pathNodes.length : indexList[i + 1]), parameters);
 
           cacheMap.addAll({tree.name: node});
           break;

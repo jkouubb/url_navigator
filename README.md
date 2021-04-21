@@ -16,69 +16,15 @@ Url Navigator是一个基于Flutter Navigator2.0的路由框架，它的特色�
 ## 构造页面树节点
 
 ```dart
-class ListPageNode extends PageTreeNode {
-  ListPageNode()
+class MainListPageNode extends PageTreeNode {
+  MainListPageNode()
       : super(
-          name: 'list_page',
-          builder: (key, name, parameters) =>
-              ListPage(key: key, name: name, parameters: parameters),
+          name: 'list',
+          routeBuilder: (settings) => NoTransitionUrlPageRoute(
+            settings: settings,
+            content: MainListPageWidget(),
+          ),
         );
-}
-
-class ListPage extends SimpleUrlPage {
-  ListPage({Key key, String name, Map<String, String> parameters})
-      : super(
-          key: key,
-          name: name,
-          parameters: parameters,
-          builder: (context) => ListPageWidget(),
-        );
-}
-
-class ListPageWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: EdgeInsets.all(10),
-      children: [
-        ConstrainedBox(
-          constraints: BoxConstraints.tight(Size(200, 40)),
-          child: ElevatedButton(
-            onPressed: () {
-              UrlDelegate.of(context).push('list_page/list_detail_page',
-                  parameters: {'name': 'alpha'});
-            },
-            child: Text('alpha'),
-          ),
-        ),
-        SizedBox(
-          height: 20,
-        ),
-        ConstrainedBox(
-          constraints: BoxConstraints.tight(Size(200, 40)),
-          child: ElevatedButton(
-            onPressed: () {
-              UrlDelegate.of(context).push('list_page/list_detail_page',
-                  parameters: {'name': 'beta'});
-            },
-            child: Text('beta'),
-          ),
-        ),
-        SizedBox(
-          height: 20,
-        ),
-        ConstrainedBox(
-          constraints: BoxConstraints.tight(Size(200, 40)),
-          child: ElevatedButton(
-            onPressed: () {
-              UrlDelegate.of(context).push('app/setting_page');
-            },
-            child: Text('setting_page'),
-          ),
-        ),
-      ],
-    );
-  }
 }
 
 ```

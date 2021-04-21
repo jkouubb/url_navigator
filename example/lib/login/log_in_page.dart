@@ -5,18 +5,10 @@ class LoginPageNode extends PageTreeNode {
   LoginPageNode()
       : super(
           name: 'login_page',
-          builder: (key, name, parameters) =>
-              LoginPage(key: key, name: name, parameters: parameters),
-        );
-}
-
-class LoginPage extends SimpleUrlPage {
-  LoginPage({Key key, String name, Map<String, String> parameters})
-      : super(
-          key: key,
-          name: name,
-          parameters: parameters,
-          builder: (context) => LoginPageWidget(),
+          routeBuilder: (settings) => UrlPageRoute(
+            settings: settings,
+            content: LoginPageWidget(),
+          ),
         );
 }
 
