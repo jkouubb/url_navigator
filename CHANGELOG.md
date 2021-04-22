@@ -1,3 +1,12 @@
-## [0.0.1] - TODO: Add release date.
+# 0.0.1
 
-* TODO: Describe initial release.
+- initial version
+
+# 0.0.2
+
+- refactor UrlPageRoute and UrlPage, now you can focus on Route instead of Route and Page
+
+# 0.0.3
+
+- support relative path
+
