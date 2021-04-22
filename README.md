@@ -96,10 +96,19 @@ class MyAppState extends State<MyApp> {
 
 ## 使用Url跳转页面
 
+### 绝对路径
+
+```dart
+
+UrlDelegate.of(context).pushReplace('app/main/enter_setting');
+
 ```
 
-UrlDelegate.of(context).push(
-                          'app/main/list/list_page/list_detail_page',
-                          parameters: {'name': 'jack'});
+### 相对路径
+
+```dart
+
+UrlDelegate.of(context).push('app:./edit_setting_page');
 
 ```
+

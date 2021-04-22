@@ -6,10 +6,8 @@ import 'package:flutter/material.dart';
 import 'route.dart';
 import 'tree.dart';
 
-abstract class UrlDelegate extends RouterDelegate<String>
-    with ChangeNotifier, TreeNodeCacheObserver {
-  static UrlDelegate of(BuildContext context) =>
-      Router.of(context).routerDelegate as UrlDelegate;
+abstract class UrlDelegate extends RouterDelegate<String> with ChangeNotifier, TreeNodeCacheObserver {
+  static UrlDelegate of(BuildContext context) => Router.of(context).routerDelegate as UrlDelegate;
 
   UrlDelegate({this.treeName, PageTreeNode initialPage}) {
     if (initialPage != null) {
@@ -48,8 +46,7 @@ abstract class UrlDelegate extends RouterDelegate<String>
     PageTreeInspector.instance.parseUrl(path, parameters: parameters);
   }
 
-  void pushReplace(String path,
-      {Map<String, String> parameters, dynamic result}) {
+  void pushReplace(String path, {Map<String, String> parameters, dynamic result}) {
     PageTreeNode oldNode = _nodeList.removeLast();
     Completer<dynamic> oldCompleter = _completerMap.remove(oldNode);
     oldCompleter.complete(result);
@@ -63,6 +60,8 @@ abstract class UrlDelegate extends RouterDelegate<String>
     Completer completer = _completerMap.remove(node);
 
     completer.complete(result);
+
+    PageTreeInspector.instance.updateTreeCurrentNode(treeName, _nodeList.last);
 
     notifyListeners();
   }
@@ -96,8 +95,7 @@ abstract class UrlDelegate extends RouterDelegate<String>
   Widget build(BuildContext context) {
     return Navigator(
       key: _key,
-      pages: List.generate(
-          _nodeList.length, (index) => _nodeList[index].getPage()),
+      pages: List.generate(_nodeList.length, (index) => _nodeList[index].getPage()),
       onPopPage: (route, result) {
         if (route.didPop(result)) {
           pop(result: result);
@@ -110,8 +108,7 @@ abstract class UrlDelegate extends RouterDelegate<String>
 }
 
 class RootUrlDelegate extends UrlDelegate {
-  RootUrlDelegate({@required String treeName, PageTreeNode initialPage})
-      : super(treeName: treeName, initialPage: initialPage);
+  RootUrlDelegate({@required String treeName, PageTreeNode initialPage}) : super(treeName: treeName, initialPage: initialPage);
 
   @override
   Future<void> setNewRoutePath(String configuration) {
@@ -138,8 +135,7 @@ class RootUrlDelegate extends UrlDelegate {
 }
 
 class SubUrlDelegate extends UrlDelegate {
-  SubUrlDelegate({@required String treeName, PageTreeNode initialPage})
-      : super(treeName: treeName, initialPage: initialPage);
+  SubUrlDelegate({@required String treeName, PageTreeNode initialPage}) : super(treeName: treeName, initialPage: initialPage);
 
   @override
   Future<void> setNewRoutePath(String configuration) {

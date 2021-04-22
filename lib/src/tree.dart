@@ -73,6 +73,9 @@ class PageTreeNode extends TreeNode {
     PageTreeNode copyNode = PageTreeNode(name: name, routeBuilder: routeBuilder, parameters: parameters);
 
     copyNode.parent = _parent;
+    for (final TreeNode node in _children) {
+      copyNode.addChild(node);
+    }
 
     return copyNode;
   }
@@ -107,16 +110,29 @@ class FolderTreeNode extends TreeNode {
 }
 
 class PageTree {
-  PageTree(this.name, this._root);
+  PageTree(this.name, this._root) {
+    _currentNode = _root;
+  }
 
   final String name;
 
   final TreeNode _root;
 
+  TreeNode _currentNode;
+
   String get rootName => _root.name;
 
+  void updateCurrentNode(TreeNode node) {
+    _currentNode = node;
+  }
+
   TreeNode findNode(List<String> pathNodes, Map<String, String> parameters) {
-    return _root.findNode(pathNodes, parameters);
+    if (pathNodes.first == '.' || pathNodes.first == '..') {
+      _currentNode = _currentNode.findNode(pathNodes, parameters);
+      return _currentNode;
+    }
+    _currentNode = _root.findNode(pathNodes, parameters);
+    return _currentNode;
   }
 }
 
@@ -138,7 +154,30 @@ class PageTreeInspector {
     _trees.add(tree);
   }
 
+  void updateTreeCurrentNode(String treeName, TreeNode currentNode) {
+    for (final PageTree tree in _trees) {
+      if (tree.name == treeName) {
+        tree.updateCurrentNode(currentNode);
+        return;
+      }
+    }
+  }
+
   void parseUrl(String path, {Map<String, String> parameters}) {
+    if (path.contains(':')) {
+      List<String> segments = path.split(':');
+      Map<String, PageTreeNode> cacheMap = {};
+
+      for (final PageTree tree in _trees) {
+        if (tree.name == segments[0]) {
+          cacheMap.addAll({tree.name: tree.findNode(segments[1].split('/'), parameters)});
+
+          TreeNodeCache.instance.flush(cacheMap);
+          return;
+        }
+      }
+    }
+
     List<String> pathNodes = path.split('/');
 
     if (parameters == null) {

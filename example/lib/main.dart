@@ -5,7 +5,6 @@ import 'list/list_detail_page.dart';
 import 'list/list_page.dart';
 import 'login/log_in_page.dart';
 import 'main/folder_node.dart';
-import 'main/main_list_page.dart';
 import 'main/main_pop_up.dart';
 import 'main/main_setting_page.dart';
 import 'main/main_toast.dart';
@@ -16,8 +15,8 @@ void main() {
   FolderTreeNode appRoot = FolderTreeNode(name: 'app');
   appRoot.addChild(LoginPageNode());
   MainFolderNode mainFolderNode = MainFolderNode();
-  mainFolderNode.addChild(MainSettingPageNode());
-  mainFolderNode.addChild(MainListPageNode());
+  mainFolderNode.addChild(MainPageNode());
+
   appRoot.addChild(mainFolderNode);
   SettingPageNode settingPageNode = SettingPageNode();
   settingPageNode.addChild(EditSettingPageNode());
