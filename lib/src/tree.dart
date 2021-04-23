@@ -25,6 +25,8 @@ abstract class TreeNode {
   TreeNode findNode(List<String> pathNodes, Map<String, String> parameters);
 
   String get path => _parent == null ? name : '${_parent.path}/$name';
+
+  String get rootName => _parent == null ? name : _parent.rootName;
 }
 
 class PageTreeNode extends TreeNode {
@@ -172,6 +174,7 @@ class PageTreeInspector {
         if (tree.name == segments[0]) {
           cacheMap.addAll({tree.name: tree.findNode(segments[1].split('/'), parameters)});
 
+          _updateStack(cacheMap.values.toList());
           TreeNodeCache.instance.flush(cacheMap);
           return;
         }
@@ -208,7 +211,32 @@ class PageTreeInspector {
       }
     }
 
+    _updateStack(cacheMap.values.toList());
     TreeNodeCache.instance.flush(cacheMap);
+  }
+
+  void _updateStack(List<PageTreeNode> nodeList) {
+    List<PageTreeNode> list = [];
+    int startIndex = -1;
+
+    for (int i = 0; i < _trees.length; i++) {
+      if (nodeList.first.rootName == _trees[i].rootName) {
+        startIndex = i;
+        break;
+      }
+    }
+
+    if (startIndex == -1) {
+      throw Exception('invalid path');
+    }
+
+    for (int i = 0; i < startIndex; i++) {
+      list.add(_trees[i]._currentNode);
+    }
+
+    list.addAll(nodeList);
+
+    UrlStackManager.instance.updateStack(list);
   }
 }
 
@@ -249,4 +277,33 @@ class TreeNodeCache {
 
 abstract class TreeNodeCacheObserver {
   void onFlush(Map<String, PageTreeNode> cacheMap);
+}
+
+class UrlStackManager {
+  static UrlStackManager _instance;
+
+  static UrlStackManager get instance {
+    if (_instance == null) {
+      _instance = UrlStackManager._internal();
+    }
+    return _instance;
+  }
+
+  UrlStackManager._internal();
+
+  final List<List<PageTreeNode>> _stack = [];
+
+  List<PageTreeNode> get currentStack => List.unmodifiable(_stack.last);
+
+  void updateStack(List<PageTreeNode> nodeList) {
+    _stack.add(nodeList);
+  }
+
+  void popStack() {
+    _stack.removeLast();
+  }
+
+  void clear() {
+    _stack.clear();
+  }
 }

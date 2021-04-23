@@ -64,6 +64,8 @@ abstract class UrlDelegate extends RouterDelegate<String> with ChangeNotifier, T
     PageTreeInspector.instance.updateTreeCurrentNode(treeName, _nodeList.last);
 
     notifyListeners();
+
+    UrlStackManager.instance.popStack();
   }
 
   void addAnonymousPageBuilder(Map<String, AnonymousPageBuilder> map) {
@@ -84,6 +86,37 @@ abstract class UrlDelegate extends RouterDelegate<String> with ChangeNotifier, T
 
   void popPopUp({dynamic result}) {
     _key.currentState.pop(result);
+  }
+
+  @override
+  String get currentConfiguration {
+    List<PageTreeNode> list = UrlStackManager.instance.currentStack;
+
+    StringBuffer buffer = StringBuffer();
+
+    for (int i = 0; i < list.length; i++) {
+      buffer.write(list[i].path);
+
+      if (i != list.length - 1) {
+        buffer.write('/');
+      }
+    }
+
+    if (list.last.parameters.isEmpty) {
+      return buffer.toString();
+    }
+
+    buffer.write('?');
+
+    for (int i = 0; i < list.last.parameters.keys.length; i++) {
+      buffer.write('${list.last.parameters.keys.elementAt(i)}=${list.last.parameters[list.last.parameters.keys.elementAt(i)]}');
+
+      if (i != list.last.parameters.keys.length - 1) {
+        buffer.write('&');
+      }
+    }
+
+    return buffer.toString();
   }
 
   @override
@@ -123,15 +156,13 @@ class RootUrlDelegate extends UrlDelegate {
   Future<void> setInitialRoutePath(String configuration) {
     _nodeList.clear();
     _completerMap.clear();
+    UrlStackManager.instance.clear();
 
     Uri uri = Uri.parse(configuration);
 
     push(uri.path, parameters: Map.from(uri.queryParameters));
     return SynchronousFuture(null);
   }
-
-  @override
-  String get currentConfiguration => _nodeList.last.path;
 }
 
 class SubUrlDelegate extends UrlDelegate {

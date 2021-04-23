@@ -1,36 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:url_navigator/url_navigator.dart';
 
-import 'main_list_page.dart';
-
-class MainPageNode extends PageTreeNode {
-  MainPageNode()
+class MainSettingPageNode extends PageTreeNode {
+  MainSettingPageNode()
       : super(
           name: 'enter_setting',
           routeBuilder: (settings) => NoTransitionUrlPageRoute(
             settings: settings,
-            content: MainPageWidget(),
+            content: MainSettingPageWidget(),
           ),
         );
 }
 
-class MainPageWidget extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => MainPageWidgetState();
-}
-
-class MainPageWidgetState extends State<MainPageWidget> {
-  int _currentIndex = 1;
-
+class MainSettingPageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       body: Builder(
         builder: (context) {
-          if (_currentIndex == 0) {
-            return MainListPageWidget();
-          }
           return Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -54,10 +42,7 @@ class MainPageWidgetState extends State<MainPageWidget> {
                   constraints: BoxConstraints.tight(Size(200, 40)),
                   child: ElevatedButton(
                     onPressed: () {
-                      UrlDelegate.of(context).push('list_page/list_detail_page', parameters: {'name': 'jack'});
-                      setState(() {
-                        _currentIndex = 0;
-                      });
+                      UrlDelegate.of(context).push('app/main/list/list_page/list_detail_page', parameters: {'name': 'jack'});
                     },
                     child: Text(
                       'detail with jack',
@@ -86,11 +71,11 @@ class MainPageWidgetState extends State<MainPageWidget> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
+        currentIndex: 1,
         onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+          if (index == 0) {
+            UrlDelegate.of(context).push('app/main/list/list_page');
+          }
         },
         items: [
           BottomNavigationBarItem(
