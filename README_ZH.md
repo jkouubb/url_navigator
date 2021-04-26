@@ -1,4 +1,4 @@
-Language: [English](README.md) | [中文简体](README-ZH.md)
+Language: [English](README.md) | [中文简体](README_ZH.md)
 
 # 什么是Url Navigator?
 Url Navigator是一个基于Flutter Navigator2.0的路由框架，它的特色如下：

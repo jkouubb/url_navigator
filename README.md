@@ -1,4 +1,4 @@
-Language: [English](README.md) | [中文简体](README-ZH.md)
+Language: [English](README.md) | [中文简体](README_ZH.md)
 
 # What is Url Navigator?
 Url Navigator is a navigation framework based on Flutter Navigator2.0. Here are its features:
