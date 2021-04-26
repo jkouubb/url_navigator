@@ -45,7 +45,7 @@ class SettingPageWidgetState extends State<SettingPageWidget> {
               constraints: BoxConstraints.tight(Size(200, 40)),
               child: ElevatedButton(
                 onPressed: () async {
-                  UrlDelegate.of(context).push('app:./edit_setting_page');
+                  UrlDelegate.of(context).push('page:./edit_setting_page');
 
                   String result = await UrlDelegate.of(context).waitResult();
 

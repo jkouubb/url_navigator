@@ -74,7 +74,7 @@ class MainSettingPageWidget extends StatelessWidget {
         currentIndex: 1,
         onTap: (index) {
           if (index == 0) {
-            UrlDelegate.of(context).push('app/main/list/list_page');
+            UrlDelegate.of(context).pushReplace('app/main/list/list_page');
           }
         },
         items: [

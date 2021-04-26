@@ -10,3 +10,7 @@
 
 - support relative path
 
+# 0.0.4
+
+- support full path
+

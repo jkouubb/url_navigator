@@ -1,3 +1,4 @@
+import 'package:example/main.dart';
 import 'package:flutter/material.dart';
 import 'package:url_navigator/url_navigator.dart';
 
@@ -12,34 +13,10 @@ class MainListPageNode extends PageTreeNode {
         );
 }
 
-class MainListPageWidget extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => _MainListPageWidgetState();
-}
-
-class _MainListPageWidgetState extends State<MainListPageWidget> {
-  SubUrlDelegate delegate;
-
-  @override
-  void initState() {
-    PageTreeNode initialPage = TreeNodeCache.instance.read('list');
-    // if (initialPage == null) {
-    //   PageTreeInspector.instance.parseUrl('list_page');
-    //   initialPage = TreeNodeCache.instance.read('list');
-    // }
-    delegate = SubUrlDelegate(treeName: 'list', initialPage: initialPage);
-    TreeNodeCache.instance.addListener(delegate);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    TreeNodeCache.instance.removeListener(delegate);
-    super.dispose();
-  }
-
+class MainListPageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    SubUrlDelegate delegate = context.findAncestorStateOfType<MyAppState>().subUrlDelegate;
     return Scaffold(
       appBar: AppBar(),
       body: Builder(
@@ -66,7 +43,7 @@ class _MainListPageWidgetState extends State<MainListPageWidget> {
         currentIndex: 0,
         onTap: (index) {
           if (index == 1) {
-            UrlDelegate.of(context).push('app/main/enter_setting');
+            UrlDelegate.of(context).pushReplace('app/main/enter_setting');
           }
         },
         items: [

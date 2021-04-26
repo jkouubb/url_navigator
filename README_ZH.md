@@ -1,21 +1,21 @@
 Language: [English](README.md) | [中文简体](README-ZH.md)
 
-# What is Url Navigator?
-Url Navigator is a navigation framework based on Flutter Navigator2.0. Here are its features:
+# 什么是Url Navigator?
+Url Navigator是一个基于Flutter Navigator2.0的路由框架，它的特色如下：
 
-1. Url Navigation: In Url Navigator, navigation is based on Url. No matter which page you current are, no matter which page you want to go(even it can be a nest navigator), all you need is passing the correct url to Url Navigator.
+1. Url跳转: 在Url Navigator中, 所有的页面跳转都是基于Url的, 无论你身处哪个页面，无论你想跳到哪个页面(即使这个页面可能是一个子路由), 你只需要把正确的Url地址交给Url Navigator, 剩下的它帮你搞定
 
-2. Better Web experience: Since navigation is based on Url, Flutter App in Url Navigator may perform better(I hope) on browser, including forward、backward、refresh and jumping directly with url input
+2. 更好的Web体验: 因为所有的页面跳转都是基于Url的, 使用Url Navigator的Flutter App在浏览器里可以有着更好的表现, 包括响应浏览器的前进、后退、刷新以及通过浏览器的Url栏直接输入Url进行跳转等
 
-Yet, Url Navigator is not so perfect as I hope, I will continue to polish it.
+当然, 目前的Url Navigator还不是很完善。比如目前尚未完全支持相对路径跳转, 对浏览器搜索栏的支持还不够完善等, 我会在后面对它进行进一步的完善。
 
-Since I am only a colleage student with few experience(though I will graduate in 2 months), code may not such good, if you are optimistic about this package and want to participate, please contact me through qq:1014252129 or email:jkouulong@qq.com
+由于自己只是一个经验尚浅的在校学生(虽然快毕业了吧), 难免有一些实现的地方不够优雅或者存在隐患。如果大家有希望和我合作开发此package的想法, 欢迎通过QQ101425129或者邮箱jkouulong@qq.com和我联系。
 
-Here are steps to use Url Navigator, for more detail, please check example project.
+下面是简单的使用Url Navigator的步骤, 更多细节请参考example工程.
 
-# How to use Url Navigator
+# Url Navigator的使用
 
-## Build page node
+## 构造页面树节点
 
 ```dart
 class MainListPageNode extends PageTreeNode {
@@ -31,7 +31,7 @@ class MainListPageNode extends PageTreeNode {
 
 ```
 
-## Build page tree
+## 构造页面树
 
 ```dart
 void main() {
@@ -70,7 +70,7 @@ void main() {
 
 ```
 
-## create router and observe cache
+## 创建Router并监听节点缓存池
 
 ```dart
 class MyAppState extends State<MyApp> {
@@ -121,19 +121,17 @@ class MyAppState extends State<MyApp> {
 
 ```
 
-## Navigator with Url
-All UrlDelegate can handle url navigation on any level of navigator. What's more, Url Navigator also supports inputing url directly on browser. You can navigate both in full path and relative path.
+## 使用Url跳转页面
+所有的UrlDelegate都可以处理任意级别的url跳转, 同时Url Navigator也支持在浏览器中直接输入url跳转, 跳转寻址方式有绝对绝对路径和相对路径两种方式。
+目前, 使用Url Navigator进行url跳转需要遵循下面几条原则:
 
-Currently, using Url Navigator to navigate needs to obey rules below:
+1. 同级别路由跳转使用绝对路径时只使用本级别下的绝对路径。如app/main/list/list_page跳转到app/main/list/list_page/list_detail_page, 其中app/main/list是根路由, list_page和list_page/list_detail_page是字路由全路径, 那么应该push 'list_page/list_detail_page'
+2. 相对路径只用来在一层路由跳转, ./a_page/../b_page是不允许的
 
-1. When you are navigating the same level page with full path, make sure url is the level you are navigating. For example, when navigating app/main/list/list_page/list_detail_page from app/main/list/list_page, url should be 'list_page/list_detail_page' instead of 'app/main/list/list_page/list_detail_page'
-2. When you are navigating with relative path, make sure path only involves single layer of navigator. For example, tree1:../a_page/tree2:./b_page is invalid.
+因为Url Navigator对多路由下对支持并不是很完美, 在后面完善后规则会逐渐放宽至没有
 
-In the future, Url Navigator will be more powerful and rules will disappear.
-
-### Navigate with full path
-
-Navigate with full path is simple, all you need is just giving the path, for example:
+### 绝对路径跳转
+绝对路径跳转很简单, 只需要输入全路径即可, 比如下面的例子：
 
 ```dart
 
@@ -141,9 +139,8 @@ UrlDelegate.of(context).pushReplace('app/main/enter_setting');
 
 ```
 
-Navigation from root navigator to a page contains nested navigator is also simple.
-
-For example, to navigate from app/main/enter_setting in root navigator to app/main/list in root navigator, which contains a nested navigator list_page/list_detail_page:
+多级路由跳转：
+下面的情景是从根路由页面app/main/enter_setting页面跳转到根路由页面app/main/list, app/main/list页面包含字路由list_page/list_detail_page。请确保所有的页面路径都对应[PageTreeNode]
 
 ```dart
 
@@ -151,8 +148,8 @@ UrlDelegate.of(context).push('app/main/list/list_page/list_detail_page', paramet
 
 ```
 
-### Navigate with relative path
-Relative path navigation only supports single level currently, for example, navigate from app/setting/seting_page to app/setting/setting_page/edit_setting_page:
+### 相对路径跳转
+相对路径跳转目前只支持单级路由跳转。比如app/setting/seting_page跳转到app/setting/setting_page/edit_setting_page可以写为:
 
 ```dart
 
@@ -161,5 +158,4 @@ UrlDelegate.of(context).push('page:./edit_setting_page'); // 'page' is the name 
 ```
 
 再次强调, 多级相对路径比如./a_page/./b_page是不支持的(一般来说也不会有这种场景)
-Remember, navigate with relative path in multiple levels(like tree1:../a_page/tree2:./b_page) is not supported currently(this occasion is rarely)
 
