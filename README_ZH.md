@@ -35,10 +35,7 @@ class MainListPageNode extends PageTreeNode {
 
 ```dart
 void main() {
-  /// Declare a top folder for your page tree.
-  ///
-  /// It is not necessary, you can always use a [PageTreeNode] as the root of your page tree.
-  /// FolderTreeNode does nothing but organize your app page tree so your url can be meaningful
+  /// Declare a top folder for your page tree. Root of the tree must be [FolderTreeNode]
   FolderTreeNode appRoot = FolderTreeNode(name: 'app');
 
   /* grow your tree */
@@ -57,9 +54,14 @@ void main() {
   PageTree rootTree = PageTree('page', appRoot);
 
   /* Another tree for nest navigator */
-  PageTreeNode listRoot = ListPageNode();
-  listRoot.addChild(ListDetailPageNode());
-  PageTree listTree = PageTree('inner', listRoot);
+  FolderTreeNode folderTreeNode = FolderTreeNode(name: 'show_list');
+
+  PageTreeNode listPageNode = ListPageNode();
+  listPageNode.addChild(ListDetailPageNode());
+
+  folderTreeNode.addChild(listPageNode);
+
+  PageTree listTree = PageTree('inner', folderTreeNode);
 
   /* Register trees */
   PageTreeManager.instance.addTree(rootTree);
@@ -107,6 +109,9 @@ class MyAppState extends State<MyApp> {
     /* Don't forget remove Delegate when the Navigator is being disposed */
     TreeNodeCache.removeObserver(delegate);
     UrlStackManager.removeObserver(delegate);
+
+    /* When delegate is being disposed, you need to reset the cursor of the tree this delegate observes */
+    PageTreeManager.instance.updateCurrentNode(delegate.treeName, null);
     super.dispose();
   }
 
@@ -123,12 +128,6 @@ class MyAppState extends State<MyApp> {
 
 ## 使用Url跳转页面
 所有的UrlDelegate都可以处理任意级别的url跳转, 同时Url Navigator也支持在浏览器中直接输入url跳转, 跳转寻址方式有绝对绝对路径和相对路径两种方式。
-目前, 使用Url Navigator进行url跳转需要遵循下面几条原则:
-
-1. 同级别路由跳转使用绝对路径时只使用本级别下的绝对路径。如app/main/list/list_page跳转到app/main/list/list_page/list_detail_page, 其中app/main/list是根路由, list_page和list_page/list_detail_page是字路由全路径, 那么应该push 'list_page/list_detail_page'
-2. 相对路径只用来在一层路由跳转, ./a_page/../b_page是不允许的
-
-因为Url Navigator对多路由下对支持并不是很完美, 在后面完善后规则会逐渐放宽至没有
 
 ### 绝对路径跳转
 绝对路径跳转很简单, 只需要输入全路径即可, 比如下面的例子：
@@ -144,7 +143,7 @@ UrlDelegate.of(context).pushReplace('app/main/enter_setting');
 
 ```dart
 
-UrlDelegate.of(context).push('app/main/list/list_page/list_detail_page', parameters: {'name': 'jack'});
+UrlDelegate.of(context).push('app/main/list/show_list/list_page/list_detail_page', parameters: {'name': 'jack'});
 
 ```
 

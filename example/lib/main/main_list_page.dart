@@ -1,4 +1,3 @@
-import 'package:example/main.dart';
 import 'package:flutter/material.dart';
 import 'package:url_navigator/url_navigator.dart';
 
@@ -13,15 +12,38 @@ class MainListPageNode extends PageTreeNode {
         );
 }
 
-class MainListPageWidget extends StatelessWidget {
+class MainListPageWidget extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => MainListPageWidgetState();
+}
+
+class MainListPageWidgetState extends State<MainListPageWidget> {
+  SubUrlDelegate subUrlDelegate;
+
+  @override
+  void initState() {
+    subUrlDelegate = SubUrlDelegate(treeName: 'inner');
+
+    TreeNodeCache.addObserver(subUrlDelegate);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    print('dispose');
+    TreeNodeCache.removeObserver(subUrlDelegate);
+
+    PageTreeManager.instance.updateCurrentNode(subUrlDelegate.treeName, null);
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    SubUrlDelegate delegate = context.findAncestorStateOfType<MyAppState>().subUrlDelegate;
     return Scaffold(
-      appBar: AppBar(),
       body: Builder(
         builder: (context) {
-          return Router(routerDelegate: delegate);
+          return Router(routerDelegate: subUrlDelegate);
         },
       ),
       floatingActionButton: FloatingActionButton(

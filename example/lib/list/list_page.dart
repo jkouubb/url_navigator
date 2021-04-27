@@ -22,7 +22,7 @@ class ListPageWidget extends StatelessWidget {
           constraints: BoxConstraints.tight(Size(200, 40)),
           child: ElevatedButton(
             onPressed: () {
-              UrlDelegate.of(context).push('list_page/list_detail_page', parameters: {'name': 'alpha'});
+              UrlDelegate.of(context).push('show_list/list_page/list_detail_page', parameters: {'name': 'alpha'});
             },
             child: Text('alpha'),
           ),

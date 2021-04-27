@@ -12,10 +12,7 @@ import 'setting/edit_setting_page.dart';
 import 'setting/setting_page.dart';
 
 void main() {
-  /// Declare a top folder for your page tree.
-  ///
-  /// It is not necessary, you can always use a [PageTreeNode] as the root of your page tree.
-  /// FolderTreeNode does nothing but organize your app page tree so your url can be meaningful
+  /// Declare a top folder for your page tree. Root of the tree must be [FolderTreeNode]
   FolderTreeNode appRoot = FolderTreeNode(name: 'app');
 
   /* grow your tree */
@@ -34,9 +31,14 @@ void main() {
   PageTree rootTree = PageTree('page', appRoot);
 
   /* Another tree for nest navigator */
-  PageTreeNode listRoot = ListPageNode();
-  listRoot.addChild(ListDetailPageNode());
-  PageTree listTree = PageTree('inner', listRoot);
+  FolderTreeNode folderTreeNode = FolderTreeNode(name: 'show_list');
+
+  PageTreeNode listPageNode = ListPageNode();
+  listPageNode.addChild(ListDetailPageNode());
+
+  folderTreeNode.addChild(listPageNode);
+
+  PageTree listTree = PageTree('inner', folderTreeNode);
 
   /* Register trees */
   PageTreeManager.instance.addTree(rootTree);
@@ -52,14 +54,12 @@ class MyApp extends StatefulWidget {
 
 class MyAppState extends State<MyApp> {
   RootUrlDelegate delegate;
-  SubUrlDelegate subUrlDelegate;
 
   @override
   void initState() {
     /* In the Root of Your app, you need to use [RootUrlDelegate] to update url on browser */
     /* Each [UrlDelegate] needs to declare the name of the tree which it cares */
     delegate = RootUrlDelegate(treeName: 'page');
-    subUrlDelegate = SubUrlDelegate(treeName: 'inner');
 
     /* AnonymousPages are Routes which are not linked with [UrlPage], their url won't show. Usually, they are used as alerts in a web page  */
     delegate.addAnonymousPageBuilder({
@@ -74,7 +74,6 @@ class MyAppState extends State<MyApp> {
 
     /* Each [UrlDelegate] is a [TreeNodeCacheObserver], they observe [TreeNodeCache], once there is a page from the tree they care in [TreeNodeCache], they pick it and update themselves */
     TreeNodeCache.addObserver(delegate);
-    TreeNodeCache.addObserver(subUrlDelegate);
 
     /* RootUrlDelegate is a [UrlStackManagerObserver], it observes the url stack. Once stack updates, it updates its currentConfiguration and notify the Root Router */
     UrlStackManager.addObserver(delegate);
@@ -85,9 +84,10 @@ class MyAppState extends State<MyApp> {
   void dispose() {
     /* Don't forget remove Delegate when the Navigator is being disposed */
     TreeNodeCache.removeObserver(delegate);
-    TreeNodeCache.removeObserver(subUrlDelegate);
-
     UrlStackManager.removeObserver(delegate);
+
+    /* When delegate is being disposed, you need to reset the cursor of the tree this delegate observes */
+    PageTreeManager.instance.updateCurrentNode(delegate.treeName, null);
     super.dispose();
   }
 

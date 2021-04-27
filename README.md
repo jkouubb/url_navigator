@@ -35,10 +35,7 @@ class MainListPageNode extends PageTreeNode {
 
 ```dart
 void main() {
-  /// Declare a top folder for your page tree.
-  ///
-  /// It is not necessary, you can always use a [PageTreeNode] as the root of your page tree.
-  /// FolderTreeNode does nothing but organize your app page tree so your url can be meaningful
+  /// Declare a top folder for your page tree. Root of the tree must be [FolderTreeNode]
   FolderTreeNode appRoot = FolderTreeNode(name: 'app');
 
   /* grow your tree */
@@ -57,9 +54,14 @@ void main() {
   PageTree rootTree = PageTree('page', appRoot);
 
   /* Another tree for nest navigator */
-  PageTreeNode listRoot = ListPageNode();
-  listRoot.addChild(ListDetailPageNode());
-  PageTree listTree = PageTree('inner', listRoot);
+  FolderTreeNode folderTreeNode = FolderTreeNode(name: 'show_list');
+
+  PageTreeNode listPageNode = ListPageNode();
+  listPageNode.addChild(ListDetailPageNode());
+
+  folderTreeNode.addChild(listPageNode);
+
+  PageTree listTree = PageTree('inner', folderTreeNode);
 
   /* Register trees */
   PageTreeManager.instance.addTree(rootTree);
@@ -107,6 +109,9 @@ class MyAppState extends State<MyApp> {
     /* Don't forget remove Delegate when the Navigator is being disposed */
     TreeNodeCache.removeObserver(delegate);
     UrlStackManager.removeObserver(delegate);
+
+    /* When delegate is being disposed, you need to reset the cursor of the tree this delegate observes */
+    PageTreeManager.instance.updateCurrentNode(delegate.treeName, null);
     super.dispose();
   }
 
@@ -124,13 +129,6 @@ class MyAppState extends State<MyApp> {
 ## Navigator with Url
 All UrlDelegate can handle url navigation on any level of navigator. What's more, Url Navigator also supports inputing url directly on browser. You can navigate both in full path and relative path.
 
-Currently, using Url Navigator to navigate needs to obey rules below:
-
-1. When you are navigating the same level page with full path, make sure url is the level you are navigating. For example, when navigating app/main/list/list_page/list_detail_page from app/main/list/list_page, url should be 'list_page/list_detail_page' instead of 'app/main/list/list_page/list_detail_page'
-2. When you are navigating with relative path, make sure path only involves single layer of navigator. For example, tree1:../a_page/tree2:./b_page is invalid.
-
-In the future, Url Navigator will be more powerful and rules will disappear.
-
 ### Navigate with full path
 
 Navigate with full path is simple, all you need is just giving the path, for example:
@@ -147,7 +145,7 @@ For example, to navigate from app/main/enter_setting in root navigator to app/ma
 
 ```dart
 
-UrlDelegate.of(context).push('app/main/list/list_page/list_detail_page', parameters: {'name': 'jack'});
+UrlDelegate.of(context).push('app/main/list/show_list/list_page/list_detail_page', parameters: {'name': 'jack'});
 
 ```
 
@@ -160,6 +158,5 @@ UrlDelegate.of(context).push('page:./edit_setting_page'); // 'page' is the name 
 
 ```
 
-再次强调, 多级相对路径比如./a_page/./b_page是不支持的(一般来说也不会有这种场景)
 Remember, navigate with relative path in multiple levels(like tree1:../a_page/tree2:./b_page) is not supported currently(this occasion is rarely)
 

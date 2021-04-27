@@ -14,3 +14,10 @@
 
 - support full path
 
+# 0.0.5
+
+- update README
+
+# 0.0.6
+
+- support inputing full path directly to navigate on browser

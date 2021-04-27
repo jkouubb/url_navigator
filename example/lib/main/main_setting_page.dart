@@ -16,7 +16,6 @@ class MainSettingPageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: Builder(
         builder: (context) {
           return Center(
@@ -42,7 +41,7 @@ class MainSettingPageWidget extends StatelessWidget {
                   constraints: BoxConstraints.tight(Size(200, 40)),
                   child: ElevatedButton(
                     onPressed: () {
-                      UrlDelegate.of(context).push('app/main/list/list_page/list_detail_page', parameters: {'name': 'jack'});
+                      UrlDelegate.of(context).push('app/main/list/show_list/list_page/list_detail_page', parameters: {'name': 'jack'});
                     },
                     child: Text(
                       'detail with jack',
@@ -74,7 +73,7 @@ class MainSettingPageWidget extends StatelessWidget {
         currentIndex: 1,
         onTap: (index) {
           if (index == 0) {
-            UrlDelegate.of(context).pushReplace('app/main/list/list_page');
+            UrlDelegate.of(context).pushReplace('app/main/list/show_list/list_page');
           }
         },
         items: [
