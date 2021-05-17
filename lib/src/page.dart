@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 
 import 'route.dart';
 
+typedef PageBuilder = UrlPageRoute Function(UrlPage settings);
+
 class UrlPage<T> extends Page<T> {
   UrlPage({@required Key key, @required String name, @required Map<String, String> parameters, @required this.routeBuilder})
       : super(key: key, name: name, arguments: parameters);
 
-  final UrlPageRoute Function(UrlPage settings) routeBuilder;
+  final PageBuilder routeBuilder;
 
   @override
   Map<String, String> get arguments => super.arguments as Map<String, String>;
