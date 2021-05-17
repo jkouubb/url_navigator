@@ -61,6 +61,18 @@ class _EditSettingPageWidgetState extends State<EditSettingPageWidget> {
                 child: Text('complete'),
               ),
             ),
+            SizedBox(
+              height: 20,
+            ),
+            ConstrainedBox(
+              constraints: BoxConstraints.tight(Size(200, 40)),
+              child: ElevatedButton(
+                onPressed: () {
+                  UrlDelegate.of(context).popUntil('app/main/enter_setting');
+                },
+                child: Text('back to main page'),
+              ),
+            ),
           ],
         ),
       ),

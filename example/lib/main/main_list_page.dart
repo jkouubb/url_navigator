@@ -30,7 +30,6 @@ class MainListPageWidgetState extends State<MainListPageWidget> {
 
   @override
   void dispose() {
-    print('dispose');
     TreeNodeCache.removeObserver(subUrlDelegate);
 
     PageTreeManager.instance.updateCurrentNode(subUrlDelegate.treeName, null);

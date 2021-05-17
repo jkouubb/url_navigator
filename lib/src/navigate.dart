@@ -211,6 +211,33 @@ abstract class UrlDelegate extends RouterDelegate<String> with ChangeNotifier, T
     notifyListeners();
   }
 
+  void popUntil(String target) {
+    bool hasTarget = false;
+
+    for (int i = _nodeList.length - 1; i >= 0; i--) {
+      if (_nodeList[i].path == target) {
+        hasTarget = true;
+        break;
+      }
+    }
+
+    if (!hasTarget) {
+      return;
+    }
+
+    while (_nodeList.last.path != target) {
+      PageTreeNode node = _nodeList.removeLast();
+
+      Completer completer = _completerMap.remove(node);
+
+      completer.complete(null);
+
+      _PageTreeInspector._pop(treeName, _nodeList.last);
+    }
+
+    notifyListeners();
+  }
+
   void addAnonymousPageBuilder(Map<String, AnonymousPageBuilder> map) {
     _anonymousPageBuilders.addAll(map);
   }
