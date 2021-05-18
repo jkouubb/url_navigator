@@ -489,6 +489,10 @@ abstract class UrlDelegate extends RouterDelegate<String> with ChangeNotifier, T
     return _key.currentState.maybePop();
   }
 
+  bool canPop() {
+    return _nodeList.length > 1;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Navigator(
