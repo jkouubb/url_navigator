@@ -8,7 +8,7 @@ import 'route.dart';
 import 'tree.dart';
 
 class _PageTreeInspector {
-  static void _push(String path, {Map<String, String> parameters}) {
+  static Map<String, PageTreeNode> _parsePath(String path, {Map<String, String> parameters}) {
     if (path.contains(':')) {
       List<String> segments = path.split(':');
       Map<String, PageTreeNode> cacheMap = {};
@@ -20,10 +20,7 @@ class _PageTreeInspector {
           if (node != null) {
             cacheMap.addAll({tree.name: node});
           }
-
-          TreeNodeCache._flush(cacheMap);
-          UrlStackManager._push(cacheMap.values.toList());
-          return;
+          return cacheMap;
         }
       }
     }
@@ -57,7 +54,13 @@ class _PageTreeInspector {
       }
     }
 
-    TreeNodeCache._flush(cacheMap);
+    return cacheMap;
+  }
+
+  static void _push(String path, {Map<String, String> parameters}) {
+    Map<String, PageTreeNode> cacheMap = _parsePath(path, parameters: parameters);
+
+    TreeNodeCache._push(cacheMap);
 
     UrlStackManager._push(cacheMap.values.toList());
     return;
@@ -66,6 +69,41 @@ class _PageTreeInspector {
   static void _pop(String treeName, PageTreeNode newNode) {
     PageTreeManager.instance.updateCurrentNode(treeName, newNode);
     UrlStackManager._pop();
+  }
+
+  static void _popUntil(String targetPath) {
+    Map<String, PageTreeNode> cacheMap = _parsePath(targetPath, parameters: {});
+
+    TreeNodeCache._popUntil(cacheMap);
+
+    UrlStackManager._popUntil(cacheMap.values.toList());
+    return;
+  }
+
+  static void _pushAndRemoveUntil(String path, String targetPath, {Map<String, String> parameters}) {
+    Map<String, PageTreeNode> pushCacheMap = _parsePath(path, parameters: parameters);
+
+    TreeNodeCache._push(pushCacheMap);
+
+    UrlStackManager._push(pushCacheMap.values.toList());
+
+    Map<String, PageTreeNode> removeCacheMap = _parsePath(targetPath, parameters: {});
+
+    TreeNodeCache._pushAndRemoveUntil(removeCacheMap);
+
+    UrlStackManager._pushAndRemoveUntil(removeCacheMap.values.toList());
+    return;
+  }
+
+  static void _pushOrReplace(String path, String replacePath, {Map<String, String> parameters}) {
+    Map<String, PageTreeNode> pushCacheMap = _parsePath(path, parameters: parameters);
+
+    Map<String, PageTreeNode> replaceCacheMap = _parsePath(replacePath, parameters: {});
+
+    TreeNodeCache._pushOrReplace(pushCacheMap, replaceCacheMap);
+
+    UrlStackManager._pushOrReplace(pushCacheMap.values.toList(), replaceCacheMap.values.toList());
+    return;
   }
 
   static void reset() {
@@ -88,11 +126,35 @@ class TreeNodeCache {
 
   static final List<TreeNodeCacheObserver> _observers = [];
 
-  static void _flush(Map<String, PageTreeNode> newCacheMap) {
+  static void _push(Map<String, PageTreeNode> newCacheMap) {
     _cacheMap.clear();
     _cacheMap.addAll(newCacheMap);
     for (final observer in _observers) {
-      observer.onFlush(_cacheMap);
+      observer.onPush(_cacheMap);
+    }
+  }
+
+  static void _popUntil(Map<String, PageTreeNode> newCacheMap) {
+    _cacheMap.clear();
+    _cacheMap.addAll(newCacheMap);
+    for (final observer in _observers) {
+      observer.onPopUntil(_cacheMap);
+    }
+  }
+
+  static void _pushAndRemoveUntil(Map<String, PageTreeNode> newCacheMap) {
+    _cacheMap.clear();
+    _cacheMap.addAll(newCacheMap);
+    for (final observer in _observers) {
+      observer.onPushAndRemoveUntil(_cacheMap);
+    }
+  }
+
+  static void _pushOrReplace(Map<String, PageTreeNode> pushCacheMap, Map<String, PageTreeNode> replaceCacheMap) {
+    _cacheMap.clear();
+    _cacheMap.addAll(pushCacheMap);
+    for (final observer in _observers) {
+      observer.onPushOrReplace(_cacheMap, replaceCacheMap);
     }
   }
 
@@ -100,7 +162,13 @@ class TreeNodeCache {
 }
 
 abstract class TreeNodeCacheObserver {
-  void onFlush(Map<String, PageTreeNode> cacheMap);
+  void onPush(Map<String, PageTreeNode> cacheMap);
+
+  void onPopUntil(Map<String, PageTreeNode> cacheMap);
+
+  void onPushAndRemoveUntil(Map<String, PageTreeNode> cacheMap);
+
+  void onPushOrReplace(Map<String, PageTreeNode> pushCacheMap, Map<String, PageTreeNode> replaceCacheMap);
 }
 
 class UrlStackManager {
@@ -144,6 +212,111 @@ class UrlStackManager {
 
     newList.addAll(nodeList);
 
+    _stack.add(newList);
+
+    _notifyObservers();
+  }
+
+  static void _popUntil(List<PageTreeNode> nodeList) {
+    for (int i = _stack.length - 1; i >= 0; i--) {
+      List<PageTreeNode> tmpList = _stack[i];
+
+      if (tmpList.length != nodeList.length) {
+        _stack.removeAt(i);
+        continue;
+      }
+
+      bool needsRemove = false;
+
+      for (int j = 0; j < tmpList.length; j++) {
+        if (tmpList[j].path != nodeList[j].path) {
+          needsRemove = true;
+          break;
+        }
+      }
+
+      if (needsRemove) {
+        _stack.removeAt(i);
+      }
+    }
+    _notifyObservers();
+  }
+
+  static void _pushAndRemoveUntil(List<PageTreeNode> nodeList) {
+    for (int i = _stack.length - 2; i >= 0; i--) {
+      List<PageTreeNode> tmpList = _stack[i];
+
+      if (tmpList.length != nodeList.length) {
+        _stack.removeAt(i);
+        continue;
+      }
+
+      bool needsRemove = false;
+
+      for (int j = 0; j < tmpList.length; j++) {
+        if (tmpList[j].path != nodeList[j].path) {
+          needsRemove = true;
+          break;
+        }
+      }
+
+      if (needsRemove) {
+        _stack.removeAt(i);
+      }
+    }
+    _notifyObservers();
+  }
+
+  static void _pushOrReplace(List<PageTreeNode> pushNodeList, List<PageTreeNode> replaceNodeList) {
+    if (_stack.isEmpty) {
+      _stack.add(pushNodeList);
+      _notifyObservers();
+      return;
+    }
+
+    List<PageTreeNode> newList = [];
+
+    int startIndex = -1;
+
+    for (int i = 0; i < _stack.last.length; i++) {
+      if (_stack.last[i].rootName == pushNodeList.first.rootName) {
+        startIndex = i;
+        break;
+      }
+    }
+
+    if (startIndex == -1) {
+      throw Exception('invalid path');
+    }
+
+    for (int i = 0; i < startIndex; i++) {
+      newList.add(_stack.last[i]);
+    }
+
+    newList.addAll(pushNodeList);
+
+    List<PageTreeNode> tmpList = _stack.last;
+
+    if (tmpList.length != replaceNodeList.length) {
+      _stack.add(newList);
+      _notifyObservers();
+      return;
+    }
+
+    bool needReplace = true;
+
+    if (tmpList.length == replaceNodeList.length) {
+      for (int i = 0; i < tmpList.length; i++) {
+        if (tmpList[i].path != replaceNodeList[i].path) {
+          needReplace = false;
+          break;
+        }
+      }
+    }
+
+    if (needReplace) {
+      _stack.removeLast();
+    }
     _stack.add(newList);
 
     _notifyObservers();
@@ -212,30 +385,17 @@ abstract class UrlDelegate extends RouterDelegate<String> with ChangeNotifier, T
   }
 
   void popUntil(String target) {
-    bool hasTarget = false;
-
-    for (int i = _nodeList.length - 1; i >= 0; i--) {
-      if (_nodeList[i].path == target) {
-        hasTarget = true;
-        break;
-      }
-    }
-
-    if (!hasTarget) {
-      return;
-    }
-
-    while (_nodeList.last.path != target) {
-      PageTreeNode node = _nodeList.removeLast();
-
-      Completer completer = _completerMap.remove(node);
-
-      completer.complete(null);
-
-      _PageTreeInspector._pop(treeName, _nodeList.last);
-    }
+    _PageTreeInspector._popUntil(target);
 
     notifyListeners();
+  }
+
+  void pushAndRemoveUntil(String path, String targetPath, {Map<String, String> parameters}) {
+    _PageTreeInspector._pushAndRemoveUntil(path, targetPath, parameters: parameters);
+  }
+
+  void pushOrReplace(String path, String replacePath, {Map<String, String> parameters}) {
+    _PageTreeInspector._pushOrReplace(path, replacePath, parameters: parameters);
   }
 
   void addAnonymousPageBuilder(Map<String, AnonymousPageBuilder> map) {
@@ -259,13 +419,66 @@ abstract class UrlDelegate extends RouterDelegate<String> with ChangeNotifier, T
   }
 
   @override
-  void onFlush(Map<String, PageTreeNode> cacheMap) {
+  void onPush(Map<String, PageTreeNode> cacheMap) {
     if (cacheMap.containsKey(treeName)) {
       PageTreeNode node = cacheMap.remove(treeName);
 
       _nodeList.add(node);
 
       _completerMap.addAll({_nodeList.last: Completer()});
+
+      notifyListeners();
+    }
+  }
+
+  @override
+  void onPopUntil(Map<String, PageTreeNode> cacheMap) {
+    if (cacheMap.containsKey(treeName)) {
+      PageTreeNode node = cacheMap.remove(treeName);
+
+      for (int i = _nodeList.length - 1; i >= 0; i--) {
+        if (node.path != _nodeList[i].path) {
+          PageTreeNode nodeToRemove = _nodeList.removeAt(i);
+          Completer completer = _completerMap.remove(nodeToRemove);
+          completer.complete();
+        }
+      }
+
+      notifyListeners();
+    }
+  }
+
+  @override
+  void onPushAndRemoveUntil(Map<String, PageTreeNode> cacheMap) {
+    if (cacheMap.containsKey(treeName)) {
+      PageTreeNode node = cacheMap.remove(treeName);
+
+      for (int i = _nodeList.length - 2; i >= 0; i--) {
+        if (node.path != _nodeList[i].path) {
+          PageTreeNode nodeToRemove = _nodeList.removeAt(i);
+          Completer completer = _completerMap.remove(nodeToRemove);
+          completer.complete();
+        }
+      }
+
+      notifyListeners();
+    }
+  }
+
+  @override
+  void onPushOrReplace(Map<String, PageTreeNode> pushCacheMap, Map<String, PageTreeNode> replaceCacheMap) {
+    if (pushCacheMap.containsKey(treeName)) {
+      PageTreeNode node = pushCacheMap.remove(treeName);
+
+      if (replaceCacheMap.containsKey(treeName)) {
+        PageTreeNode nodeToReplace = replaceCacheMap.remove(treeName);
+
+        if (nodeToReplace.path == _nodeList.last.path) {
+          _nodeList.removeLast();
+        }
+      }
+
+      _nodeList.add(node);
 
       notifyListeners();
     }

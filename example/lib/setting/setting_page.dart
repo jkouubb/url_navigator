@@ -58,6 +58,18 @@ class SettingPageWidgetState extends State<SettingPageWidget> {
                 child: Text('edit setting'),
               ),
             ),
+            SizedBox(
+              height: 20,
+            ),
+            ConstrainedBox(
+              constraints: BoxConstraints.tight(Size(200, 40)),
+              child: ElevatedButton(
+                onPressed: () {
+                  UrlDelegate.of(context).pushAndRemoveUntil('page:./edit_setting_page', 'app/main/enter_setting');
+                },
+                child: Text('push and remove'),
+              ),
+            ),
           ],
         ),
       ),
