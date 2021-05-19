@@ -1,6 +1,6 @@
 name: url_navigator
 description: A flutter navigate framework based on flutter navigator 2.0, providing a better performance on browser for your app.
-version: 0.1.4
+version: 0.1.5
 homepage: https://github.com/jkouubb/url_navigator
 
 environment:

@@ -555,6 +555,10 @@ class RootUrlDelegate extends UrlDelegate with UrlStackObserver {
     buffer.write('?');
 
     for (int i = 0; i < nodeList.last.parameters.keys.length; i++) {
+      RegExp exp = RegExp(r'^##([a-zA-Z0-9_]*)##$');
+      if (exp.hasMatch(nodeList.last.parameters.keys.elementAt(i))) {
+        continue;
+      }
       buffer.write('${nodeList.last.parameters.keys.elementAt(i)}=${nodeList.last.parameters[nodeList.last.parameters.keys.elementAt(i)]}');
 
       if (i != nodeList.last.parameters.keys.length - 1) {
