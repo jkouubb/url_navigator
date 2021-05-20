@@ -360,6 +360,8 @@ abstract class UrlDelegate extends RouterDelegate<String> with ChangeNotifier, T
 
   Future waitResult() => _completerMap[_nodeList.last].future;
 
+  bool get userGestureInProgress => _key.currentState.userGestureInProgress;
+
   void push(String path, {Map<String, String> parameters}) {
     _PageTreeInspector._push(path, parameters: parameters);
   }
