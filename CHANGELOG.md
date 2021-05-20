@@ -53,3 +53,7 @@ add method canPop
 # 0.1.7
 
 - add method containerPage
+
+# 0.1.8
+
+- fix bug

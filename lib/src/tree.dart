@@ -74,7 +74,9 @@ class PageTreeNode extends TreeNode {
   PageTreeNode _copy(Map<String, String> parameters) {
     Map<String, String> param = {};
 
-    param.addAll(parameters);
+    if (parameters != null && parameters.isNotEmpty) {
+      param.addAll(parameters);
+    }
 
     PageTreeNode copyNode = PageTreeNode(name: name, routeBuilder: routeBuilder, parameters: param);
 
