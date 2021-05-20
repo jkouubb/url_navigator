@@ -21,3 +21,35 @@
 # 0.0.6
 
 - support inputing full path directly to navigate on browser
+
+# 0.1.0
+
+- refactor code
+
+# 0.1.1
+
+- add popUntil method
+
+# 0.1.2
+
+- add type PageBuilder
+
+# 0.1.3
+
+- add method pushAndRemoveUntil, pushOrReplace
+
+# 0.1.4
+
+add method canPop
+
+# 0.1.5
+
+- support invisible parameter
+
+# 0.1.6
+
+- add method get userGestureInProgress
+
+# 0.1.7
+
+- add method containerPage

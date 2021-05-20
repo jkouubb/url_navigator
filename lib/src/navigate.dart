@@ -420,6 +420,8 @@ abstract class UrlDelegate extends RouterDelegate<String> with ChangeNotifier, T
     _key.currentState.pop(result);
   }
 
+  bool containsPage(String path) => _nodeList.any((element) => element.path == path);
+
   @override
   void onPush(Map<String, PageTreeNode> cacheMap) {
     if (cacheMap.containsKey(treeName)) {

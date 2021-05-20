@@ -11,7 +11,6 @@ class ListDetailPageNode extends PageTreeNode {
               name: settings.arguments['name'],
             ),
           ),
-          validParameterKeys: ['name'],
         );
 }
 

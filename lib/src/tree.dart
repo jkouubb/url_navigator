@@ -33,19 +33,12 @@ class PageTreeNode extends TreeNode {
   PageTreeNode({
     @required String name,
     @required this.routeBuilder,
-    List<String> validParameterKeys,
     Map<String, String> parameters,
   }) : super(name: name) {
     if (parameters != null) {
       _parameters.addAll(parameters);
     }
-
-    if (validParameterKeys != null && validParameterKeys.isNotEmpty) {
-      _validParameter.addAll(validParameterKeys);
-    }
   }
-
-  final List<String> _validParameter = [];
 
   final Map<String, String> _parameters = {};
 
@@ -81,13 +74,7 @@ class PageTreeNode extends TreeNode {
   PageTreeNode _copy(Map<String, String> parameters) {
     Map<String, String> param = {};
 
-    if (parameters != null && parameters.isNotEmpty) {
-      for (final String key in parameters.keys) {
-        if (_validParameter.contains(key)) {
-          param.addAll({key: parameters[key]});
-        }
-      }
-    }
+    param.addAll(parameters);
 
     PageTreeNode copyNode = PageTreeNode(name: name, routeBuilder: routeBuilder, parameters: param);
 
