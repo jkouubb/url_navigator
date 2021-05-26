@@ -57,3 +57,7 @@ add method canPop
 # 0.1.8
 
 - fix bug
+
+# 0.1.9
+
+- fix bug

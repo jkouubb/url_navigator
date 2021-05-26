@@ -484,6 +484,8 @@ abstract class UrlDelegate extends RouterDelegate<String> with ChangeNotifier, T
 
       _nodeList.add(node);
 
+      _completerMap.addAll({_nodeList.last: Completer()});
+
       notifyListeners();
     }
   }
