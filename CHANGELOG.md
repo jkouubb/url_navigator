@@ -61,3 +61,7 @@ add method canPop
 # 0.1.9
 
 - fix bug
+
+# 0.1.10
+
+- add method currentPage, which allow user get current page's path

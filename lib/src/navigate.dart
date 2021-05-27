@@ -345,6 +345,7 @@ abstract class UrlDelegate extends RouterDelegate<String> with ChangeNotifier, T
     PageTreeNode initialPage = TreeNodeCache._read(treeName);
     if (initialPage != null) {
       _nodeList.add(initialPage);
+      _completerMap.addAll({_nodeList.last: Completer()});
     }
   }
 
@@ -421,6 +422,8 @@ abstract class UrlDelegate extends RouterDelegate<String> with ChangeNotifier, T
   }
 
   bool containsPage(String path) => _nodeList.any((element) => element.path == path);
+
+  String get currentPage => _nodeList.last.path;
 
   @override
   void onPush(Map<String, PageTreeNode> cacheMap) {
