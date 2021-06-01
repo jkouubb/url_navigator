@@ -69,3 +69,7 @@ add method canPop
 # 0.1.11
 
 - fix bug on method pushAndRemoveUntil
+
+# 0.1.12
+
+- fix bug on method push

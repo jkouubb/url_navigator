@@ -152,10 +152,9 @@ class PageTree {
 
     if (_currentNode == null || !_currentNode.compare(node)) {
       _currentNode = node;
-      return _currentNode;
     }
 
-    return null;
+    return _currentNode;
   }
 
   void reset() {
