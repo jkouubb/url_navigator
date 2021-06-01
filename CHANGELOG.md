@@ -73,3 +73,7 @@ add method canPop
 # 0.1.12
 
 - fix bug on method push
+
+# 0.1.13
+
+- fix bug on method push

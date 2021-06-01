@@ -461,7 +461,7 @@ abstract class UrlDelegate extends RouterDelegate<String> with ChangeNotifier, T
     if (pushMap.containsKey(treeName)) {
       PageTreeNode node = pushMap.remove(treeName);
 
-      if (!node.compare(_nodeList.last)) {
+      if (_nodeList.isEmpty || !node.compare(_nodeList.last)) {
         _nodeList.add(node);
 
         _completerMap.addAll({_nodeList.last: Completer()});
