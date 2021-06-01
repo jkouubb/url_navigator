@@ -65,3 +65,7 @@ add method canPop
 # 0.1.10
 
 - add method currentPage, which allow user get current page's path
+
+# 0.1.11
+
+- fix bug on method pushAndRemoveUntil
