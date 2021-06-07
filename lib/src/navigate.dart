@@ -336,7 +336,7 @@ class UrlManager {
   static void _pushOrReplace(String path, String replacePath, Map<String, String> parameters) {
     Map<String, PageTreeNode> pushMap = _parsePath(path, parameters);
 
-    Map<String, PageTreeNode> replaceMap = _parsePath(path, {});
+    Map<String, PageTreeNode> replaceMap = _parsePath(replacePath, {});
 
     for (final String key in pushMap.keys) {
       if (!_nodeListMap.containsKey(key)) {
@@ -369,7 +369,7 @@ class UrlManager {
 
   static void _pushAndRemoveUntil(String path, String targetPath, Map<String, String> parameters) {
     Map<String, PageTreeNode> pushMap = _parsePath(path, parameters);
-    Map<String, PageTreeNode> removeMap = _parsePath(path, {});
+    Map<String, PageTreeNode> removeMap = _parsePath(targetPath, {});
 
     for (final String key in removeMap.keys) {
       if (!_nodeListMap.containsKey(key)) {
