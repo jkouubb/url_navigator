@@ -85,3 +85,7 @@ add method canPop
 # 0.2.1
 
 - refactor code
+
+# 0.2.2
+
+- fix bug on method pushOrReplace

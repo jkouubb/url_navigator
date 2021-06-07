@@ -355,7 +355,7 @@ class UrlManager {
         }
       }
 
-      if (_nodeListMap[key].isEmpty || !pushMap[key].compare(_nodeListMap[pushMap].last)) {
+      if (_nodeListMap[key].isEmpty || !pushMap[key].compare(_nodeListMap[key].last)) {
         _nodeListMap[key].add(pushMap[key]);
 
         _completerMap[key].addAll({pushMap[key]: Completer()});
