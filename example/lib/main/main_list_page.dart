@@ -24,13 +24,13 @@ class MainListPageWidgetState extends State<MainListPageWidget> {
   void initState() {
     subUrlDelegate = SubUrlDelegate(treeName: 'inner');
 
-    TreeNodeCache.addObserver(subUrlDelegate);
+    UrlManager.addListener(subUrlDelegate);
     super.initState();
   }
 
   @override
   void dispose() {
-    TreeNodeCache.removeObserver(subUrlDelegate);
+    UrlManager.removeListener(subUrlDelegate);
 
     PageTreeManager.instance.updateCurrentNode(subUrlDelegate.treeName, null);
 

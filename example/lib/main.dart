@@ -72,8 +72,8 @@ class MyAppState extends State<MyApp> {
           ),
     });
 
-    /* Each [UrlDelegate] is a [TreeNodeCacheObserver], they observe [TreeNodeCache], once there is a page from the tree they care in [TreeNodeCache], they pick it and update themselves */
-    TreeNodeCache.addObserver(delegate);
+    /* Each [UrlDelegate] is a [UrlListener], they observe [UrlManager], once there is a List<PageTreeNode> change from [UrlManager], they accept the new one and update themselves */
+    UrlManager.addListener(delegate);
 
     /* RootUrlDelegate is a [UrlStackManagerObserver], it observes the url stack. Once stack updates, it updates its currentConfiguration and notify the Root Router */
     UrlStackManager.addObserver(delegate);
@@ -83,7 +83,7 @@ class MyAppState extends State<MyApp> {
   @override
   void dispose() {
     /* Don't forget remove Delegate when the Navigator is being disposed */
-    TreeNodeCache.removeObserver(delegate);
+    UrlManager.removeListener(delegate);
     UrlStackManager.removeObserver(delegate);
 
     /* When delegate is being disposed, you need to reset the cursor of the tree this delegate observes */
