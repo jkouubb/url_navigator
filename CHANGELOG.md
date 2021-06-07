@@ -77,3 +77,7 @@ add method canPop
 # 0.1.13
 
 - fix bug on method push
+
+# 0.1.14
+
+- fix bug on url generating
