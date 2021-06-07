@@ -81,3 +81,7 @@ add method canPop
 # 0.1.14
 
 - fix bug on url generating
+
+# 0.2.1
+
+- refactor code
