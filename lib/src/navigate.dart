@@ -78,14 +78,14 @@ class UrlStackManager {
     _notifyObservers();
   }
 
-  static void _pushAndRemoveUntil(List<PageTreeNode> pushNodeList, List<PageTreeNode> removeNodeList) {
+  static void _pushAndRemoveUntil(List<PageTreeNode> pushNodeList, List<PageTreeNode> targetNodeList) {
     if (_stack.isEmpty) {
       _stack.add(pushNodeList);
       _notifyObservers();
       return;
     }
 
-    List<PageTreeNode> newList = [];
+    List<PageTreeNode> newPushNodeList = [];
 
     int startIndex = -1;
 
@@ -101,17 +101,38 @@ class UrlStackManager {
     }
 
     for (int i = 0; i < startIndex; i++) {
-      newList.add(_stack.last[i]);
+      newPushNodeList.add(_stack.last[i]);
     }
 
-    newList.addAll(pushNodeList);
+    newPushNodeList.addAll(pushNodeList);
 
-    _stack.add(newList);
+    List<PageTreeNode> newTargetNodeList = [];
+
+    startIndex = -1;
+
+    for (int i = 0; i < _stack.last.length; i++) {
+      if (_stack.last[i].rootName == targetNodeList.first.rootName) {
+        startIndex = i;
+        break;
+      }
+    }
+
+    if (startIndex == -1) {
+      throw Exception('invalid path');
+    }
+
+    for (int i = 0; i < startIndex; i++) {
+      newTargetNodeList.add(_stack.last[i]);
+    }
+
+    newTargetNodeList.addAll(targetNodeList);
+
+    _stack.add(newPushNodeList);
 
     for (int i = _stack.length - 2; i >= 0; i--) {
       List<PageTreeNode> tmpList = _stack[i];
 
-      if (tmpList.length != removeNodeList.length) {
+      if (tmpList.length != newTargetNodeList.length) {
         _stack.removeAt(i);
         continue;
       }
@@ -119,7 +140,7 @@ class UrlStackManager {
       bool needsRemove = false;
 
       for (int j = 0; j < tmpList.length; j++) {
-        if (tmpList[j].path != removeNodeList[j].path) {
+        if (tmpList[j].path != newTargetNodeList[j].path) {
           needsRemove = true;
           break;
         }
@@ -173,7 +194,7 @@ class UrlStackManager {
       return;
     }
 
-    List<PageTreeNode> newList = [];
+    List<PageTreeNode> newPushList = [];
 
     int startIndex = -1;
 
@@ -189,34 +210,53 @@ class UrlStackManager {
     }
 
     for (int i = 0; i < startIndex; i++) {
-      newList.add(_stack.last[i]);
+      newPushList.add(_stack.last[i]);
     }
 
-    newList.addAll(pushNodeList);
+    newPushList.addAll(pushNodeList);
+
+    List<PageTreeNode> newReplaceList = [];
+
+    startIndex = -1;
+
+    for (int i = 0; i < _stack.last.length; i++) {
+      if (_stack.last[i].rootName == replaceNodeList.first.rootName) {
+        startIndex = i;
+        break;
+      }
+    }
+
+    if (startIndex == -1) {
+      throw Exception('invalid path');
+    }
+
+    for (int i = 0; i < startIndex; i++) {
+      newReplaceList.add(_stack.last[i]);
+    }
+
+    newReplaceList.addAll(replaceNodeList);
 
     List<PageTreeNode> tmpList = _stack.last;
 
-    if (tmpList.length != replaceNodeList.length) {
-      _stack.add(newList);
+    if (tmpList.length != newReplaceList.length) {
+      _stack.add(newPushList);
       _notifyObservers();
       return;
     }
 
     bool needReplace = true;
 
-    if (tmpList.length == replaceNodeList.length) {
-      for (int i = 0; i < tmpList.length; i++) {
-        if (tmpList[i].path != replaceNodeList[i].path) {
-          needReplace = false;
-          break;
-        }
+    for (int i = 0; i < tmpList.length; i++) {
+      if (tmpList[i].path != newReplaceList[i].path) {
+        needReplace = false;
+        break;
       }
     }
 
     if (needReplace) {
       _stack.removeLast();
     }
-    _stack.add(newList);
+    _stack.add(newPushList);
 
     _notifyObservers();
   }

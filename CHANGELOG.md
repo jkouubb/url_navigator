@@ -93,3 +93,7 @@ add method canPop
 # 0.2.3
 
 - fix bug on pushOrReplace and pushAndRemoveUntil
+
+# 0.2.4
+
+- fix bug on pushOrReplace and pushAndRemoveUntil
