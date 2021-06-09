@@ -468,6 +468,13 @@ class UrlManager {
     _notifyListeners();
   }
 
+  static void reset() {
+    _nodeListMap.clear();
+    _completerMap.clear();
+
+    PageTreeManager.instance.reset();
+  }
+
   static Map<String, PageTreeNode> _parsePath(String path, Map<String, String> parameters) {
     if (path.contains(':')) {
       List<String> segments = path.split(':');
@@ -595,7 +602,11 @@ abstract class UrlDelegate extends RouterDelegate<String> with ChangeNotifier, U
 
   @override
   Future<bool> popRoute() {
-    return _key.currentState.maybePop();
+    if (canPop()) {
+      pop();
+      return SynchronousFuture(true);
+    }
+    return SynchronousFuture(false);
   }
 
   bool canPop() {
@@ -636,6 +647,8 @@ class RootUrlDelegate extends UrlDelegate with UrlStackObserver {
 
   @override
   Future<void> setNewRoutePath(String configuration) {
+    UrlManager.reset();
+
     Uri uri = Uri.parse(configuration);
 
     push(configuration.split('?')[0], parameters: Map.from(uri.queryParameters));

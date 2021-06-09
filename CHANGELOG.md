@@ -97,3 +97,9 @@ add method canPop
 # 0.2.4
 
 - fix bug on pushOrReplace and pushAndRemoveUntil
+
+# 0.2.5
+
+- fix bug on pop and popUntil
+
+- fix README and README_ZH

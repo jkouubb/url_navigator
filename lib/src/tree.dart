@@ -189,5 +189,11 @@ class PageTreeManager {
     }
   }
 
+  void reset() {
+    for (final PageTree tree in _trees) {
+      tree._currentNode = null;
+    }
+  }
+
   List<PageTree> get trees => List.unmodifiable(_trees);
 }

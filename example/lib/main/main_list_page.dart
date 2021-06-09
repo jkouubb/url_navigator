@@ -40,11 +40,7 @@ class MainListPageWidgetState extends State<MainListPageWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Builder(
-        builder: (context) {
-          return Router(routerDelegate: subUrlDelegate);
-        },
-      ),
+      body: Router(routerDelegate: subUrlDelegate),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           bool result = await UrlDelegate.of(context).pushPopUp('pop_up');

@@ -107,7 +107,7 @@ class MyAppState extends State<MyApp> {
   void dispose() {
 
     /* Don't forget remove Delegate when the Navigator is being disposed */
-    TreeNodeCache.removeObserver(delegate);
+    UrlManager.removeListener(delegate);
     UrlStackManager.removeObserver(delegate);
 
     /* When delegate is being disposed, you need to reset the cursor of the tree this delegate observes */
