@@ -90,4 +90,16 @@ class MainListPageWidgetState extends State<MainListPageWidget> {
       ),
     );
   }
+
+  @override
+  void didUpdateWidget(covariant MainListPageWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print('lalala');
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+  }
 }

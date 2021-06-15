@@ -108,6 +108,12 @@ class PageTreeNode extends TreeNode {
 
     return true;
   }
+
+  @override
+  bool operator ==(Object other) => identical(this, other) || other is PageTreeNode && runtimeType == other.runtimeType && compare(other);
+
+  @override
+  int get hashCode => _parameters.hashCode ^ routeBuilder.hashCode;
 }
 
 class FolderTreeNode extends TreeNode {

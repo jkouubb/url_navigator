@@ -103,3 +103,7 @@ add method canPop
 - fix bug on pop and popUntil
 
 - fix README and README_ZH
+
+# 0.2.6
+
+- fix bug on popUntil

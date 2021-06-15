@@ -65,7 +65,7 @@ class UrlStackManager {
       bool needsRemove = false;
 
       for (int j = 0; j < tmpList.length; j++) {
-        if (tmpList[j].path != nodeList[j].path) {
+        if (tmpList[j].compare(nodeList[j])) {
           needsRemove = true;
           break;
         }
@@ -454,11 +454,11 @@ class UrlManager {
     _notifyListeners();
   }
 
-  static void _popUntil(String targetPath) {
-    Map<String, PageTreeNode> map = _parsePath(targetPath, {});
+  static void _popUntil(String targetPath, Map<String, String> parameters) {
+    Map<String, PageTreeNode> map = _parsePath(targetPath, parameters);
 
     for (final String key in map.keys) {
-      while (_nodeListMap[key].isNotEmpty && _nodeListMap[key].last.path != map[key].path) {
+      while (_nodeListMap.containsKey(key) && _nodeListMap[key].isNotEmpty && !_nodeListMap[key].last.compare(map[key])) {
         _completerMap[key].remove(_nodeListMap[key].removeLast());
       }
     }
@@ -510,7 +510,8 @@ class UrlManager {
     for (int i = 0; i < indexList.length; i++) {
       for (final PageTree tree in PageTreeManager.instance.trees) {
         if (tree.rootName == pathNodes[indexList[i]]) {
-          PageTreeNode node = tree.findNode(pathNodes.sublist(indexList[i], i == indexList.length - 1 ? pathNodes.length : indexList[i + 1]), parameters);
+          PageTreeNode node = tree.findNode(
+              pathNodes.sublist(indexList[i], i == indexList.length - 1 ? pathNodes.length : indexList[i + 1]), i == indexList.length - 1 ? parameters : {});
 
           if (node != null) {
             cacheMap.addAll({tree.name: node});
@@ -564,8 +565,8 @@ abstract class UrlDelegate extends RouterDelegate<String> with ChangeNotifier, U
     UrlManager._pop(treeName, result: result);
   }
 
-  void popUntil(String target) {
-    UrlManager._popUntil(target);
+  void popUntil(String target, {Map<String, String> parameters}) {
+    UrlManager._popUntil(target, parameters);
   }
 
   void pushAndRemoveUntil(String path, String targetPath, {Map<String, String> parameters}) {
@@ -633,7 +634,9 @@ abstract class UrlDelegate extends RouterDelegate<String> with ChangeNotifier, U
 
   @override
   void onNodeListUpdate(List<PageTreeNode> newNodeList) {
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      notifyListeners();
+    });
   }
 }
 
@@ -647,13 +650,25 @@ class RootUrlDelegate extends UrlDelegate with UrlStackObserver {
 
   @override
   Future<void> setNewRoutePath(String configuration) {
-    UrlManager.reset();
+    // forward
+    if (UrlStackManager._stack.isEmpty || !UrlStackManager._stack.any((element) => _generateUrl(element) == configuration)) {
+      Uri uri = Uri.parse(configuration);
 
-    Uri uri = Uri.parse(configuration);
+      push(configuration.split('?')[0], parameters: Map.from(uri.queryParameters));
 
-    push(configuration.split('?')[0], parameters: Map.from(uri.queryParameters));
+      return SynchronousFuture(null);
+    }
 
-    return SynchronousFuture(null);
+    // back
+    else if (UrlStackManager._stack.any((element) => _generateUrl(element) == configuration)) {
+      Uri uri = Uri.parse(configuration);
+
+      UrlManager._popUntil(configuration.split('?')[0], Map.from(uri.queryParameters));
+
+      return SynchronousFuture(null);
+    }
+
+    throw Exception('invalid url');
   }
 
   @override
